@@ -1,0 +1,52 @@
+{
+  "name": "@theatersoft/history",
+  "version": "1.0.0",
+  "description": "Bus service module for device event history database",
+  "repository": "theatersoft/history",
+  "main": "history.js",
+  "module": "history.es.js",
+  "engines": {
+    "node": ">=8.5.0"
+  },
+  "author": "Rob Huehn <rob@theatersoft.com>",
+  "license": "AGPL-3.0",
+  "scripts": {
+    "build": "node build.js && ls -l dist",
+    "build:dist": "DIST=true npm run build",
+    "link": "npm link --no-package-lock @theatersoft/device",
+    "publish": "node build.js publish",
+    "watch": "node build.js watch"
+  },
+  "dist": {
+    "dependencies": {
+      "@theatersoft/bus": "~1"
+    },
+    "devDependencies": {},
+    "scripts": {
+      "BUS": "env $(cat /opt/theatersoft/.config/theatersoft/.bus | xargs)",
+      "DEVBUS": "env $(cat ~/.config/theatersoft/.bus | xargs)",
+      "DEVRUN": "npm run DEVBUS -- node",
+      "RUN": "npm run BUS -- node",
+      "link": "npm link --no-package-lock; npm link --no-package-lock @theatersoft/bus @theatersoft/server @theatersoft/history",
+      "start": "npm run RUN -- start.js",
+      "start:dev": "npm run DEVRUN -- start.js",
+      "debug": "npm run BUS -- node --inspect-brk start.js",
+      "debug:dev": "npm run DEVBUS -- node --inspect-brk start.js"
+    }
+  },
+  "devDependencies": {
+    "@theatersoft/device": "~1",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-class-properties": "^6.19.0",
+    "babel-plugin-transform-object-rest-spread": "^6.22.0",
+    "babel-plugin-transform-react-jsx": "^6.8.0",
+    "babel-preset-babili": "0.0.8",
+    "chokidar": "^1.6.1",
+    "rollup": "^0.42.0",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-ignore": "^1.0.3",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "rollup-plugin-strip": "^1.1.1",
+    "shelljs": "^0.7.4"
+  }
+}
