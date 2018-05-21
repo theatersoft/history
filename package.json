@@ -31,7 +31,9 @@
       "start": "npm run RUN -- start.js",
       "start:dev": "npm run DEVRUN -- start.js",
       "debug": "npm run BUS -- node --inspect-brk start.js",
-      "debug:dev": "npm run DEVBUS -- node --inspect-brk start.js"
+      "debug:dev": "npm run DEVBUS -- node --inspect-brk start.js",
+      "start:influxdb": "DIR=/opt/theatersoft/.config/theatersoft/History && mkdir -p $DIR/influxdb && docker run --name influxdb -p 8083:8083 -p 8086:8086 -v $DIR/influxdb:/var/lib/influxdb -v $(pwd)/influxdb.conf:/etc/influxdb/influxdb.conf:ro influxdb:1.5-alpine",
+      "config:influxdb": "docker run --rm influxdb:1.5-alpine influxd config > influxdb.conf"
     }
   },
   "devDependencies": {
