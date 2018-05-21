@@ -1,33 +1,32 @@
 import bus from '@theatersoft/bus'
 import * as Influx from 'influx'
+import {log} from './log'
+import {buildSchema} from './db'
 
 export class History {
     async start ({name, config: {}}) {
         this.name = name
         const obj = await bus.registerObject(name, this)
 
+        const devices = []
         const influx = new Influx.InfluxDB({
             host: 'localhost',
             database: name,
-            schema: [
-                {
-                    measurement: 'measurement',
-                    fields: {
-                        path: Influx.FieldType.STRING,
-                        duration: Influx.FieldType.INTEGER
-                    },
-                    tags: [
-                        'host'
-                    ]
-                }
-            ]
+            schema: buildSchema(devices)
         })
 
-        const dbs = await influx.getDatabaseNames()
-        if (!dbs.includes(name)) await influx.createDatabase(name)
-
+        bus.registerListener('Device.state', state => this.write(state))
     }
 
     stop () {
+    }
+
+    async create () {
+        const dbs = await influx.getDatabaseNames()
+        if (!dbs.includes(name)) await influx.createDatabase(name)
+    }
+
+    write (state) {
+        log(state)
     }
 }
