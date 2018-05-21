@@ -23,51 +23,83 @@ const targets = {
         console.log('target node')
         exec('mkdir -p dist')
         rollup({
-                entry: 'src/History.js',
-                external: [
-                    ...Object.keys(dependencies)
-                ],
-                plugins: [
-                    babel({
-                        babelrc: false,
-                        comments: !DIST,
-                        minified: DIST,
-                        //presets: [babili],
-                        plugins: [
-                            //require("babel-plugin-transform-class-properties"),
-                            [require("babel-plugin-transform-object-rest-spread"), {useBuiltIns: true}]
-                        ].concat(DIST ? [
-                            require("babel-plugin-minify-constant-folding"),
-                            //require("babel-plugin-minify-dead-code-elimination"), // FAIL NodePath has been removed so is read-only
-                            require("babel-plugin-minify-flip-comparisons"),
-                            require("babel-plugin-minify-guarded-expressions"),
-                            require("babel-plugin-minify-infinity"),
-                            require("babel-plugin-minify-mangle-names"),
-                            require("babel-plugin-minify-replace"),
-                            //FAIL require("babel-plugin-minify-simplify"),
-                            require("babel-plugin-minify-type-constructors"),
-                            require("babel-plugin-transform-member-expression-literals"),
-                            require("babel-plugin-transform-merge-sibling-variables"),
-                            require("babel-plugin-transform-minify-booleans"),
-                            require("babel-plugin-transform-property-literals"),
-                            require("babel-plugin-transform-simplify-comparison-operators"),
-                            require("babel-plugin-transform-undefined-to-void")
-                        ] : [])
-                    }),
-                    DIST && ignore(['remote-redux-devtools']),
-                    DIST && strip({functions: ['composeWithDevTools']}),
-                    nodeResolve({jsnext: true})
-                ]
-            })
+            entry: 'src/History.js',
+            external: [
+                ...Object.keys(dependencies)
+            ],
+            plugins: [
+                babel({
+                    babelrc: false,
+                    comments: !DIST,
+                    minified: DIST,
+                    //presets: [babili],
+                    plugins: [
+                        //require("babel-plugin-transform-class-properties"),
+                        [require("babel-plugin-transform-object-rest-spread"), {useBuiltIns: true}]
+                    ].concat(DIST ? [
+                        require("babel-plugin-minify-constant-folding"),
+                        //require("babel-plugin-minify-dead-code-elimination"), // FAIL NodePath has been removed so is read-only
+                        require("babel-plugin-minify-flip-comparisons"),
+                        require("babel-plugin-minify-guarded-expressions"),
+                        require("babel-plugin-minify-infinity"),
+                        require("babel-plugin-minify-mangle-names"),
+                        require("babel-plugin-minify-replace"),
+                        //FAIL require("babel-plugin-minify-simplify"),
+                        require("babel-plugin-minify-type-constructors"),
+                        require("babel-plugin-transform-member-expression-literals"),
+                        require("babel-plugin-transform-merge-sibling-variables"),
+                        require("babel-plugin-transform-minify-booleans"),
+                        require("babel-plugin-transform-property-literals"),
+                        require("babel-plugin-transform-simplify-comparison-operators"),
+                        require("babel-plugin-transform-undefined-to-void")
+                    ] : [])
+                }),
+                DIST && ignore(['remote-redux-devtools']),
+                DIST && strip({functions: ['composeWithDevTools']}),
+                nodeResolve({jsnext: true})
+            ]
+        })
             .then(bundle =>
                 bundle.write({
-                        dest: `dist/${name}.js`,
-                        format: 'cjs',
-                        moduleName: name,
-                        banner: copyright,
-                        sourceMap: DIST ? false : 'inline'
-                    })
+                    dest: `dist/${name}.js`,
+                    format: 'cjs',
+                    moduleName: name,
+                    banner: copyright,
+                    sourceMap: DIST ? false : 'inline'
+                })
                     .then(() => console.log(`wrote dist/${name}.js`))
+            )
+    },
+
+    start () {
+        console.log('target node')
+        exec('mkdir -p dist')
+        rollup({
+            entry: 'start.js',
+            external: [
+                ...Object.keys(dependencies)
+            ],
+            plugins: [
+                babel({
+                    babelrc: false,
+                    comments: !DIST,
+                    minified: DIST,
+                    plugins: [
+                        [require("babel-plugin-transform-object-rest-spread"), {useBuiltIns: true}]
+                    ]
+                }),
+                nodeResolve({jsnext: true})
+            ]
+        })
+            .then(bundle =>
+                bundle.write({
+                    dest: `dist/start.js`,
+                    format: 'cjs',
+                    moduleName: name,
+                    banner: copyright,
+                    sourceMap: DIST ? false : 'inline'
+                })
+                    .then(() => console.log(`wrote dist/start.js`))
             )
     },
 
@@ -149,6 +181,7 @@ const targets = {
 
     async all () {
         targets.node()
+        targets.start()
         await targets.client()
         targets.package()
     }

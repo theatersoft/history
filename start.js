@@ -1,1 +1,2 @@
-require('@theatersoft/server/lib').startLocalService('History')
+import {startLocalService} from '@theatersoft/server/lib.es'
+startLocalService('History')
