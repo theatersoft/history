@@ -4,7 +4,7 @@ import {log} from './log'
 import {buildSchema} from './db'
 
 export class History {
-    async start ({name, config: {}}) {
+    async start ({name}) {
         this.name = name
         const obj = await bus.registerObject(name, this)
 
@@ -19,6 +19,7 @@ export class History {
     }
 
     stop () {
+        return bus.unregisterObject(this.name)
     }
 
     async create () {

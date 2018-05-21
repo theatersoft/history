@@ -1,2 +1,6 @@
 import {startLocalService} from '@theatersoft/server/lib.es'
-startLocalService('History')
+startLocalService({
+    module: '@theatersoft/history',
+    export: 'History',
+    name: 'History'
+})
