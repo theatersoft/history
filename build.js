@@ -161,7 +161,7 @@ const targets = {
 
     package () {
         writeJson('dist/package.json', Object.assign({}, pkg, {private: !DIST, dist: undefined}, pkg.dist))
-        exec('cp LICENSE README.md start.js .npmignore influxdb.conf dist')
+        exec('cp LICENSE README.md .npmignore influxdb.conf dist')
     },
 
     publish () {
@@ -175,13 +175,12 @@ const targets = {
                 console.log(path)
                 await targets.node()
                 await targets.client()
-                await targets.package()
             })
     },
 
     async all () {
-        targets.node()
-        targets.start()
+        await targets.node()
+        await targets.start()
         await targets.client()
         targets.package()
     }
