@@ -1,21 +1,33 @@
 import bus from '@theatersoft/bus'
+import * as Influx from 'influx'
 
 export class History {
-    start ({name, config: {}}) {
+    async start ({name, config: {}}) {
         this.name = name
-        return bus.registerObject(name, this)
-            .then(obj => {
-                const register = () => bus.proxy('Device').registerService(this.name)
-                bus.registerListener(`Device.start`, register)
-                bus.on('reconnect', register)
-                register()
-            })
+        const obj = await bus.registerObject(name, this)
+
+        const influx = new Influx.InfluxDB({
+            host: 'localhost',
+            database: name,
+            schema: [
+                {
+                    measurement: 'measurement',
+                    fields: {
+                        path: Influx.FieldType.STRING,
+                        duration: Influx.FieldType.INTEGER
+                    },
+                    tags: [
+                        'host'
+                    ]
+                }
+            ]
+        })
+
+        const dbs = await influx.getDatabaseNames()
+        if (!dbs.includes(name)) await influx.createDatabase(name)
+
     }
 
     stop () {
-    }
-
-    getState () {
-        return this.store.getState()
     }
 }
