@@ -1,7 +1,8 @@
 export const
-    last2 = last => f => (current, ...rest) => {
-        f(current, last, ...rest)
+    last2 = last => f => current => {
+        const result = f(current, last)
         last = current
+        return result
     },
     flatten = devices => Object.values(devices).reduce((o, device) => {
         const
