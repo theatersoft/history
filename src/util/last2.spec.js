@@ -8,18 +8,20 @@ chai.use(sinonchai)
 
 describe('prev', () => {
     const
-        both = last2(),
+        both = last2(0),
         spy = sinon.spy(),
         call = both(spy)
-    it('creates a callable function', () => {
+    it('takes an initial value and returns a callable function', () => {
         expect(both).to.be.a('function')
+    })
+    it('which takes a callback returning another function', () => {
         expect(call).to.be.a('function')
     })
-    it('should return (current value, undefined) when first called', () => {
+    it('first called with (current, initial value)', () => {
         call(1)
-        expect(spy).to.have.been.calledWithExactly(1, undefined)
+        expect(spy).to.have.been.calledWithExactly(1, 0)
     })
-    it('should return (current value, previous value) when next called', () => {
+    it('second called with (current, last)', () => {
         call(2)
         expect(spy).to.have.been.calledWithExactly(2, 1)
     })
