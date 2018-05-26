@@ -7,7 +7,9 @@ export class History {
         await bus.registerObject(name, this)
         try {
             this.influx = await create(name,)
-            bus.registerListener('Device.state', ({devices}) => write(devices, this.influx))
+            bus.registerListener('Device.state',
+                ({devices}) => write(Object.values(devices), this.influx)
+            )
         } catch (e) {
             this.stop()
             throw e

@@ -1,6 +1,7 @@
 import * as Influx from 'influx'
-import {Interface, Type, interfaceOfType} from '@theatersoft/device'
+import {Interface, Type, interfaceOfType, serviceId} from '@theatersoft/device'
 import {error, log} from "./log"
+import {last2} from './util'
 
 const
     Measurement = {
@@ -51,14 +52,18 @@ export const create = async (name) => {
     }
 }
 
-export const write = (state, influx) => {
-    log(state)
-    // TODO diff
-    // influx.writePoints([
-    //     {
-    //         measurement: 'devices',
-    //         tags: { type, id, name },
-    //         fields: { bool, num},
-    //     }
-    // ])
-}
+const filter = f => (devices, ...rest) => f(
+    devices.filter(({id}) => !['Automation', 'Hvac'].includes(serviceId(id)[0])),
+    ...rest)
+
+export const write = filter(last2()((devices, prev, influx) => {
+    console.log(devices, prev)
+// TODO diff
+// influx.writePoints([
+//     {
+//         measurement: 'devices',
+//         tags: { type, id, name },
+//         fields: { bool, num},
+//     }
+// ])
+}))
