@@ -1,20 +1,14 @@
 import * as Influx from 'influx'
 import {Interface, Type, interfaceOfType, serviceId} from '@theatersoft/device'
 import {error, log} from "./log"
-import {last2} from './util'
+import {flatten, last2, diffs} from './util'
 
 const
     Measurement = {
         BOOLEAN: 'boolean',
-        FLOAT: 'float',
+        INTEGER: 'integer',
         STRING: 'string'
     },
-    measurementOfInterface = i => ({
-        [Interface.SENSOR_BINARY]: Measurement.BOOLEAN,
-        [Interface.SWITCH_BINARY]: Measurement.BOOLEAN,
-        [Interface.SENSOR_MULTILEVEL]: Measurement.FLOAT,
-        [Interface.SWITCH_MULTILEVEL]: Measurement.FLOAT
-    }),
     schema = [
         {
             measurement: Measurement.BOOLEAN,
@@ -22,8 +16,8 @@ const
             tags: ['type', 'id', 'name']
         },
         {
-            measurement: Measurement.FLOAT,
-            fields: {value: Influx.FieldType.FLOAT,},
+            measurement: Measurement.INTEGER,
+            fields: {value: Influx.FieldType.INTEGER,},
             tags: ['type', 'id', 'name']
         },
         {
@@ -52,18 +46,32 @@ export const create = async (name) => {
     }
 }
 
-const filter = f => (devices, ...rest) => f(
-    devices.filter(({id}) => !['Automation', 'Hvac'].includes(serviceId(id)[0])),
-    ...rest)
+const
+    measurementOfInterface = i => ({
+        [Interface.SENSOR_BINARY]: Measurement.BOOLEAN,
+        [Interface.SWITCH_BINARY]: Measurement.BOOLEAN,
+        [Interface.SENSOR_MULTILEVEL]: Measurement.INTEGER,
+        [Interface.SWITCH_MULTILEVEL]: Measurement.INTEGER
+    })[i],
+    measurementOfValue = i => ({
+        'boolean': Measurement.BOOLEAN,
+        'number': Measurement.INTEGER,
+        'string': Measurement.STRING,
+    })[typeof i],
+    propDefined = p => x => x[p] !== undefined,
+    pointsOfDevices = devices =>
+        devices
+            .map(({type, id, name, value}) => ({
+                measurement: measurementOfValue(value) || measurementOfInterface(interfaceOfType(type)),
+                tags: {type, id, name},
+                value,
+            }))
+            .filter(propDefined('measurement')),
+    pipe = (f, g) => x => g(f(x)),
+    filter = pipe(flatten, last2({})(diffs))
 
-export const write = filter(last2()((devices, prev, influx) => {
-    console.log(devices, prev)
-// TODO diff
-// influx.writePoints([
-//     {
-//         measurement: 'devices',
-//         tags: { type, id, name },
-//         fields: { bool, num},
-//     }
-// ])
-}))
+export const write = (devices, influx) => {
+    const points = pointsOfDevices(filter(devices))
+    console.log(points)
+    // influx.writePoints()
+}
