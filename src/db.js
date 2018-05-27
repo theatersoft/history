@@ -1,7 +1,7 @@
 import * as Influx from 'influx'
 import {Interface, Type, interfaceOfType, serviceId} from '@theatersoft/device'
 import {error, log} from "./log"
-import {flatten, last2, diffs, pipe3} from './util'
+import {flatten, last2, diffs, pipe} from './util'
 
 const
     Measurement = {
@@ -68,8 +68,8 @@ const
             }))
             .filter(propDefined('measurement')),
     filterServices = devices =>
-        devices.filter(({id}) => !['Automation'].includes(serviceId(id)[0])),
-    filter = pipe3(flatten, last2({})(diffs), filterServices)
+        devices.filter(({id}) => !['Automation', 'Hvac'].includes(serviceId(id)[0])),
+    filter = pipe(flatten, last2({})(diffs), filterServices)
 
 export const write = (devices, influx) => {
     const points = pointsOfDevices(filter(devices))

@@ -1,4 +1,4 @@
-import {diffs, flatten, last2, pipe2} from "../util"
+import {diffs, flatten, last2, pipe} from "../util"
 import chai from 'chai'
 
 const {expect} = chai
@@ -11,7 +11,7 @@ describe('filter', () => {
         second = {
             A: {id: 'A', value: 2}
         },
-        filter = pipe2(flatten, last2({})(diffs))
+        filter = pipe(flatten, last2({})(diffs))
 
     it('first call returns all', () => {
         expect(filter(first)).to.deep.equal([{id: 'A', value: 1}])
