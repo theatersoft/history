@@ -38,8 +38,8 @@ export const create = async (name) => {
         if (!dbs.includes(name)) {
             await influx.createDatabase(name)
             log(`created database ${name}`)
-            return influx
         }
+        return influx
     } catch (e) {
         error(`InfluxDB database create failed`);
         throw e
@@ -64,7 +64,7 @@ const
             .map(({type, id, name, value}) => ({
                 measurement: measurementOfValue(value),
                 tags: {type, id, name},
-                value,
+                fields: {value},
             }))
             .filter(propDefined('measurement')),
     filterServices = devices =>
@@ -73,6 +73,6 @@ const
 
 export const write = (devices, influx) => {
     const points = pointsOfDevices(filter(devices))
-    log(points)
-    // influx.writePoints()
+    // log(points)
+    if (points.length) influx.writePoints(points)
 }
