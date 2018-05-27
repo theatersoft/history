@@ -62,13 +62,15 @@ const
     pointsOfDevices = devices =>
         devices
             .map(({type, id, name, value}) => ({
-                measurement: measurementOfValue(value) || measurementOfInterface(interfaceOfType(type)),
+                measurement: measurementOfValue(value),
                 tags: {type, id, name},
                 value,
             }))
             .filter(propDefined('measurement')),
-    pipe = (f, g) => x => g(f(x)),
-    filter = pipe(flatten, last2({})(diffs))
+    filterServices = devices =>
+        devices.filter(({id}) => !['Automation'].includes(serviceId(id)[0])),
+    pipe = (f, g, h) => x => h(g(f(x))),
+    filter = pipe(flatten, last2({})(diffs), filterServices)
 
 export const write = (devices, influx) => {
     const points = pointsOfDevices(filter(devices))
