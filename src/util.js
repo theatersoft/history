@@ -21,4 +21,7 @@ export const
             .filter(([id, device]) =>
                 ((a, b) => !b || a.value !== b.value)(device, last[id])
             )
-            .map(([id, device]) => device)
+            .map(([id, device]) => device),
+    pipe2 = (f, g) => x => g(f(x)),
+    pipe3 = (f, g, h) => x => h(g(f(x)))
+
