@@ -12,17 +12,17 @@ const
     schema = [
         {
             measurement: Measurement.BOOLEAN,
-            fields: {value: Influx.FieldType.BOOLEAN,},
+            fields: {value: Influx.FieldType.BOOLEAN},
             tags: ['type', 'id', 'name']
         },
         {
             measurement: Measurement.INTEGER,
-            fields: {value: Influx.FieldType.INTEGER,},
+            fields: {value: Influx.FieldType.INTEGER},
             tags: ['type', 'id', 'name']
         },
         {
             measurement: Measurement.STRING,
-            fields: {value: Influx.FieldType.STRING,},
+            fields: {value: Influx.FieldType.STRING},
             tags: ['type', 'id', 'name']
         }
     ]
@@ -73,6 +73,8 @@ const
 
 export const write = (devices, influx) => {
     const points = pointsOfDevices(filter(devices))
-    // log(points)
-    if (points.length) influx.writePoints(points)
+    if (points.length){
+        log(points)
+        influx.writePoints(points)
+    }
 }

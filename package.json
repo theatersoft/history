@@ -1,6 +1,6 @@
 {
   "name": "@theatersoft/history",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bus service module for device event history database",
   "repository": "theatersoft/history",
   "main": "history.js",
@@ -33,16 +33,11 @@
       "start:dev": "npm run DEVRUN -- start.js",
       "debug": "npm run BUS -- node --inspect-brk start.js",
       "debug:dev": "npm run DEVBUS -- node --inspect-brk start.js",
-      "docker:ps": "docker ps -a",
-      "run:influxdb": "DIR=/opt/theatersoft/.config/theatersoft/History && mkdir -p $DIR/influxdb && docker run --name theatersoft_influxdb -p 8086:8086 -v $DIR/influxdb:/var/lib/influxdb -v $(pwd)/influxdb.conf:/etc/influxdb/influxdb.conf:ro influxdb:1.5-alpine",
+      "config:influxdb": "docker run --rm influxdb:1.5-alpine influxd config > influxdb.conf",
+      "run:influxdb": "DIR=/opt/theatersoft/.config/theatersoft/History && mkdir -p $DIR/influxdb && docker run -d --restart always --name theatersoft_influxdb -p 8086:8086 -v $DIR/influxdb:/var/lib/influxdb -v $(pwd)/influxdb.conf:/etc/influxdb/influxdb.conf:ro influxdb:1.5-alpine",
       "restart:influxdb": "docker restart theatersoft_influxdb",
       "stop:influxdb": "docker stop theatersoft_influxdb",
-      "config:influxdb": "docker run --rm influxdb:1.5-alpine influxd config > influxdb.conf",
-      "run:chronograf": "echo 'open chronograf at http://localhost:8888/' && docker run --name theatersoft_chronograf --net=host chronograf:alpine --influxdb-url=http://localhost:8086",
-      "stop:chronograf": "docker stop theatersoft_chronograf",
-      "restart:chronograf": "docker restart theatersoft_chronograf",
-      "rm:influxdb": "docker rm theatersoft_influxdb",
-      "rm:chronograf": "docker rm theatersoft_chronograf"
+      "run:chronograf": "echo 'open chronograf at http://localhost:8888/' && docker run --rm --name theatersoft_chronograf --net=host chronograf:alpine --influxdb-url=http://localhost:8086"
     }
   },
   "devDependencies": {
